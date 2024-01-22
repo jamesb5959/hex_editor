@@ -1,6 +1,14 @@
 #include <stdio.h>
+#include <string.h>
 
-void readFirstLineHex(const char *filePath, int bytesPerLine) {
+void printHelp() {
+	printf("Usage: program_name [-h] [-hex] <file_path>\n");
+	printf("Options:\n");
+	printf("  -h      : Print help\n");
+	printf("  -hex    : Read and print the first line in hexadecimal\n");
+}
+
+void readHex(const char *filePath, int bytesPerLine) {
 	FILE *file = fopen(filePath, "rb");
 	if (file == NULL) {
 		printf("File not found: %s\n", filePath);
@@ -16,7 +24,7 @@ void readFirstLineHex(const char *filePath, int bytesPerLine) {
 	// Convert the bytes to hex representation
 		for (size_t i = 0; i < bytesRead; i++) {
 			printf("%02X ", buffer[i]);
-			if (i%2 == 0) {
+			if (i%2 != 0) {
 				printf(" ");
 			}
 		}
@@ -38,9 +46,31 @@ void readFirstLineHex(const char *filePath, int bytesPerLine) {
 	fclose(file);
 }
 
-int main() {
-	const char *filePath = "/home/james/link.txt";
+int main(int argc, char *argv[]) {
+	if (argc < 2) {
+		printf("Error: Missing file path argument.\n");
+		printHelp();
+		return 1;
+	}
 	int bytesPerLine = 16;
-	readFirstLineHex(filePath, bytesPerLine);
-	return 0;
+  if (argc >= 2) {
+		if (strcmp(argv[1], "-h") == 0) {
+			printHelp();
+			return 0;
+		} 
+		else if (strcmp(argv[1], "-hex") == 0) {
+			// Call readFirstLineHex function
+			const char *filePath = argv[2];
+			readHex(filePath, bytesPerLine);
+			return 0;
+		} 
+		else {
+			printf("Error: Unknown argument %s\n", argv[2]);
+			printHelp();
+			return 1;
+		}
+	}
+	printf("Error: Invalid number of arguments.\n");
+	printHelp();
+	return 1;
 }
